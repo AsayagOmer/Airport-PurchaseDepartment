@@ -39,7 +39,6 @@ public class Kiosk {
 
         // Data structures to hold the current transaction details
         Map<Product, Integer> cart = new HashMap<>();
-        float totalBill = 0;
 
         // 2. Loop for Products and Amounts
         while (true) {
@@ -55,12 +54,10 @@ public class Kiosk {
                 int quantity = scanner.nextInt();
 
                 if (quantity > 0) {
-                    float cost = checkoutService.calculateItemCost(product, quantity);
-                    totalBill += cost;
-
                     // Add to cart (updates quantity if product already exists in cart)
                     cart.put(product, cart.getOrDefault(product, 0) + quantity);
-
+                    
+                    float cost = checkoutService.calculateItemCost(product, quantity);
                     System.out.printf("Added %d x %s to cart ($%.2f)\n\n", quantity, product.getProductName(), cost);
                 } else {
                     System.out.println("Quantity must be greater than 0.");
@@ -77,6 +74,9 @@ public class Kiosk {
         }
 
         System.out.println("\nProcessing your transaction...");
+
+        // Parallelize total bill calculation
+        float totalBill = checkoutService.calculateTotalBill(cart);
 
         // Pass the collected data to the process class
         boolean isSuccess = checkoutService.processCheckout(currentUser, cart, totalBill);

@@ -43,7 +43,7 @@ public class PurchaseRepository {
                 }
             }
 
-            // 2. Insert items into Purchase_Items and update stock
+            // 2. Insert items into Purchase_Items and update stock using Batch Processing (Parallelization of DB tasks)
             try (PreparedStatement pstmtItem = conn.prepareStatement(insertItemSql);
                  PreparedStatement pstmtStock = conn.prepareStatement(updateStockSql)) {
 
@@ -51,20 +51,26 @@ public class PurchaseRepository {
                     Product product = entry.getKey();
                     int quantity = entry.getValue();
 
-                    // Add row to Purchase_Items table
+                    // Add row to Purchase_Items table batch
                     pstmtItem.setInt(1, newPurchaseId);
                     pstmtItem.setInt(2, product.getProductId());
                     pstmtItem.setInt(3, quantity);
-                    pstmtItem.executeUpdate();
+                    pstmtItem.addBatch();
 
-                    // Reduce stock in Products table
+                    // Reduce stock in Products table batch
                     pstmtStock.setInt(1, quantity);
                     pstmtStock.setInt(2, product.getProductId());
                     pstmtStock.setInt(3, quantity);
+                    pstmtStock.addBatch();
+                }
 
-                    int affectedRows = pstmtStock.executeUpdate();
+                // Execute batches
+                pstmtItem.executeBatch();
+                int[] stockUpdates = pstmtStock.executeBatch();
+
+                for (int affectedRows : stockUpdates) {
                     if (affectedRows == 0) {
-                        throw new SQLException("Not enough stock for product ID: " + product.getProductId());
+                        throw new SQLException("Not enough stock for one of the products");
                     }
                 }
             }

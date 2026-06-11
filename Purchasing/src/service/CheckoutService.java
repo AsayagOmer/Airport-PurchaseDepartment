@@ -61,6 +61,23 @@ public class CheckoutService {
     }
 
     /**
+     * Calculates the total bill for the entire cart in parallel.
+     *
+     * @param cart A map containing the products to be bought and their quantities.
+     * @return The total cost of the purchase.
+     */
+    public float calculateTotalBill(Map<Product, Integer> cart) {
+        if (cart == null || cart.isEmpty()) {
+            return 0f;
+        }
+        
+        // Parallelize the calculation of the total bill across cart items
+        return cart.entrySet().parallelStream()
+                .map(entry -> calculateItemCost(entry.getKey(), entry.getValue()))
+                .reduce(0f, Float::sum);
+    }
+
+    /**
      * Processes the final checkout by passing the transaction data to the repository.
      *
      * @param passenger The authenticated passenger making the purchase.
