@@ -87,3 +87,9 @@ mvn clean javafx:run
 ```
 
 *Note: Once the UI launches, you can test the system by entering passenger passport `12345` to see the ML recommendations dynamically load.*
+
+---
+
+## 📄 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
