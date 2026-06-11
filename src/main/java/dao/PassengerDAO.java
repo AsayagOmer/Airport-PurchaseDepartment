@@ -15,8 +15,8 @@ public class PassengerDAO {
     private static final Map<String, Passenger> MOCK_PASSENGERS = new HashMap<>();
 
     static {
-        MOCK_PASSENGERS.put("12345", new Passenger(101, "Ofek", "Aharoni", "12345", "Israeli", "2000-01-01", 123456789, "ofek@example.com"));
-        MOCK_PASSENGERS.put("67890", new Passenger(102, "Ilay", "Asayag", "67890", "Israeli", "1999-05-12", 987654321, "ilay@example.com"));
+        MOCK_PASSENGERS.put("5994471abb01112afcc18159f6cc74b4f511b99806da59b3caf5a9c173cacfc5", new Passenger(101, "Ofek", "Aharoni", "5994471abb01112afcc18159f6cc74b4f511b99806da59b3caf5a9c173cacfc5", "Israeli", "2000-01-01", 123456789, "ofek@example.com"));
+        MOCK_PASSENGERS.put("e2217d3e4e120c6a3372a1890f03e232b35ad659d71f7a62501a4ee204a3e66d", new Passenger(102, "Ilay", "Asayag", "e2217d3e4e120c6a3372a1890f03e232b35ad659d71f7a62501a4ee204a3e66d", "Israeli", "1999-05-12", 987654321, "ilay@example.com"));
     }
 
     public Passenger findByPassportNumber(String number){

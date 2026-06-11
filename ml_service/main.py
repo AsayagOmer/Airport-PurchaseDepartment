@@ -14,11 +14,11 @@ def get_recommendations(passenger_id: str):
     Returns a list of recommended product IDs for the given passenger.
     This is a mock implementation.
     """
-    # Simple mock logic based on passenger_id string
-    if passenger_id == "12345":
+    # Simple mock logic based on hashed passenger_id string
+    if passenger_id == "5994471abb01112afcc18159f6cc74b4f511b99806da59b3caf5a9c173cacfc5": # 12345
         # Recommend Toblerone and Chanel
         recommended_ids = [2, 3]
-    elif passenger_id == "67890":
+    elif passenger_id == "e2217d3e4e120c6a3372a1890f03e232b35ad659d71f7a62501a4ee204a3e66d": # 67890
         # Recommend Whisky and Toblerone
         recommended_ids = [1, 2]
     else:

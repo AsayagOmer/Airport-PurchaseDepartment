@@ -34,7 +34,8 @@ public class CheckoutService {
      * Fetches recommended products for a passenger from the ML microservice.
      */
     public java.util.List<Product> getRecommendedProducts(String passportNumber) {
-        java.util.List<Integer> recommendedIds = mlServiceClient.getRecommendations(passportNumber);
+        String hashedPassport = util.HashUtil.hashSHA256(passportNumber);
+        java.util.List<Integer> recommendedIds = mlServiceClient.getRecommendations(hashedPassport);
         java.util.List<Product> recommendedProducts = new java.util.ArrayList<>();
         for (Integer id : recommendedIds) {
             Product p = getProduct(id);
@@ -52,7 +53,8 @@ public class CheckoutService {
      * @return The Passenger object if found, otherwise null.
      */
     public Passenger authenticatePassenger(String passportNumber) {
-        return passengerDAO.findByPassportNumber(passportNumber);
+        String hashedPassport = util.HashUtil.hashSHA256(passportNumber);
+        return passengerDAO.findByPassportNumber(hashedPassport);
     }
 
     /**
