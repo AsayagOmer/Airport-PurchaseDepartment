@@ -31,6 +31,7 @@ public class DashboardApp extends Application {
     private Button checkoutButton;
     private Button scanButton;
     private Button addButton;
+    private VBox recommendationsBox;
 
     @Override
     public void init() {
@@ -79,10 +80,16 @@ public class DashboardApp extends Application {
         addButton.setMaxWidth(Double.MAX_VALUE);
         addButton.setDisable(true); // Disabled until passenger is scanned
 
+        Label recommendLabel = new Label("3. Recommended for You");
+        recommendLabel.setStyle("-fx-font-weight: bold;");
+        recommendationsBox = new VBox(5);
+
         leftPanel.getChildren().addAll(
                 authLabel, passportField, scanButton, passengerInfoLabel,
                 new Separator(),
-                productLabel, productIdField, quantityField, addButton
+                productLabel, productIdField, quantityField, addButton,
+                new Separator(),
+                recommendLabel, recommendationsBox
         );
 
         // Center Panel (Cart & Total)
@@ -143,11 +150,33 @@ public class DashboardApp extends Application {
             passengerInfoLabel.setText("Welcome, " + currentPassenger.getFirstName() + " " + currentPassenger.getLastName() + "!");
             passengerInfoLabel.setStyle("-fx-text-fill: #4CAF50;");
             addButton.setDisable(false);
+            
+            // Fetch recommendations asynchronously to avoid blocking UI
+            new Thread(() -> {
+                java.util.List<Product> recommended = checkoutService.getRecommendedProducts(passport);
+                Platform.runLater(() -> {
+                    recommendationsBox.getChildren().clear();
+                    if (recommended.isEmpty()) {
+                        recommendationsBox.getChildren().add(new Label("No recommendations available."));
+                    } else {
+                        for (Product p : recommended) {
+                            Button recBtn = new Button("Add " + p.getProductName() + " (+" + p.getProductId() + ")");
+                            recBtn.setMaxWidth(Double.MAX_VALUE);
+                            recBtn.setOnAction(ev -> {
+                                productIdField.setText(String.valueOf(p.getProductId()));
+                                quantityField.setText("1");
+                            });
+                            recommendationsBox.getChildren().add(recBtn);
+                        }
+                    }
+                });
+            }).start();
         } else {
             passengerInfoLabel.setText("Passenger not found.");
             passengerInfoLabel.setStyle("-fx-text-fill: #F44336;");
             addButton.setDisable(true);
             currentPassenger = null;
+            recommendationsBox.getChildren().clear();
         }
     }
 
@@ -204,6 +233,7 @@ public class DashboardApp extends Application {
             passengerInfoLabel.setStyle("-fx-text-fill: #E0E0E0;");
             addButton.setDisable(true);
             checkoutButton.setDisable(true);
+            recommendationsBox.getChildren().clear();
             updateCartView();
         } else {
             showAlert(Alert.AlertType.ERROR, "Error", "Checkout failed. Please check product stock.");

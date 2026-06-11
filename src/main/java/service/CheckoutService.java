@@ -18,6 +18,7 @@ public class CheckoutService {
     private final PassengerDAO passengerDAO;
     private final ProductDAO productDAO;
     private final PurchaseRepository purchaseRepository;
+    private final MLServiceClient mlServiceClient;
 
     /**
      * Initializes the CheckoutService with the necessary DAOs and Repository.
@@ -26,6 +27,22 @@ public class CheckoutService {
         this.passengerDAO = new PassengerDAO();
         this.productDAO = new ProductDAO();
         this.purchaseRepository = new PurchaseRepository();
+        this.mlServiceClient = new MLServiceClient();
+    }
+
+    /**
+     * Fetches recommended products for a passenger from the ML microservice.
+     */
+    public java.util.List<Product> getRecommendedProducts(String passportNumber) {
+        java.util.List<Integer> recommendedIds = mlServiceClient.getRecommendations(passportNumber);
+        java.util.List<Product> recommendedProducts = new java.util.ArrayList<>();
+        for (Integer id : recommendedIds) {
+            Product p = getProduct(id);
+            if (p != null) {
+                recommendedProducts.add(p);
+            }
+        }
+        return recommendedProducts;
     }
 
     /**
