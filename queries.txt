@@ -1,0 +1,47 @@
+-- 0. Drop existing tables and types to allow clean re-execution
+DROP TABLE IF EXISTS Purchase_Items CASCADE;
+DROP TABLE IF EXISTS Purchases CASCADE;
+DROP TABLE IF EXISTS Products CASCADE;
+DROP TABLE IF EXISTS Employees CASCADE;
+DROP TABLE IF EXISTS Passengers CASCADE;
+DROP TABLE IF EXISTS Users CASCADE;
+DROP TYPE IF EXISTS employee_role CASCADE;
+
+-- 1. Create Passengers Table
+-- The passenger_id is both the Primary Key and a Foreign Key to Users
+CREATE TABLE passengers (
+    passenger_id INT PRIMARY KEY,
+    first_name VARCHAR(255),
+    last_name VARCHAR(255),
+    passport_number VARCHAR(255),
+    nationality VARCHAR(255),
+    date_of_birth VARCHAR(255),
+    phone INT,
+    email VARCHAR(255)
+);
+
+-- 2. Create Product Catalog Table (Updated fields)
+CREATE TABLE Products (
+    product_id SERIAL PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    price FLOAT NOT NULL,
+    stock INT NOT NULL DEFAULT 0,
+    tags VARCHAR(255),
+    sale VARCHAR(20)
+);
+
+-- 3. Create Purchases Table (Receipt Header)
+CREATE TABLE Purchasing_table (
+    purchase_id SERIAL PRIMARY KEY,
+    purchase_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP, -- ב-Postgres משתמשים ב-TIMESTAMP עבור תאריך ושעה
+    user_id INT REFERENCES passengers(passenger_id),
+    total_price FLOAT NOT NULL
+);
+
+-- 4. Create Purchase Items Table (Receipt Lines)
+CREATE TABLE Purchase_Items (
+    purchase_item_id SERIAL PRIMARY KEY,
+    purchase_id INT REFERENCES Purchases(purchase_id) ON DELETE CASCADE,
+    product_id INT REFERENCES Products(product_id),
+    amount INT NOT NULL
+);
