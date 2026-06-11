@@ -8,11 +8,19 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
-
-
+import java.util.Map;
 
 public class ProductDAO implements DAO<Product> {
+
+    private static final Map<Integer, Product> MOCK_PRODUCTS = new HashMap<>();
+
+    static {
+        MOCK_PRODUCTS.put(1, new Product(1, "Whisky Gold Label", 120.0f, 50, "Alcohol", "1+1"));
+        MOCK_PRODUCTS.put(2, new Product(2, "Toblerone Chocolate", 15.5f, 100, "Food", "20% off"));
+        MOCK_PRODUCTS.put(3, new Product(3, "Chanel No. 5 Perfume", 95.0f, 20, "Perfume", "None"));
+    }
 
     @Override
     public Product findById(int id) {
@@ -30,9 +38,13 @@ public class ProductDAO implements DAO<Product> {
                 }
             }
         } catch (SQLException e) {
-            System.err.println("Error finding product by ID: " + e.getMessage());
+            System.err.println("Database error finding product by ID, using mock fallback. Reason: " + e.getMessage());
+            return MOCK_PRODUCTS.get(id);
+        } catch (Exception e) {
+            System.err.println("Error finding product, using mock fallback. Reason: " + e.getMessage());
+            return MOCK_PRODUCTS.get(id);
         }
-        return null; // Return null if the product was not found
+        return MOCK_PRODUCTS.get(id);
     }
 
     @Override
@@ -48,7 +60,8 @@ public class ProductDAO implements DAO<Product> {
                 products.add(extractProductFromResultSet(rs));
             }
         } catch (SQLException e) {
-            System.err.println("Error retrieving all products: " + e.getMessage());
+            System.err.println("Database error retrieving all products, using mock fallback. Reason: " + e.getMessage());
+            return new ArrayList<>(MOCK_PRODUCTS.values());
         }
         return products;
     }
@@ -75,7 +88,12 @@ public class ProductDAO implements DAO<Product> {
             return affectedRows > 0;
 
         } catch (SQLException e) {
-            System.err.println("Error reducing stock: " + e.getMessage());
+            System.err.println("Database error reducing stock, using mock fallback. Reason: " + e.getMessage());
+            Product p = MOCK_PRODUCTS.get(productId);
+            if (p != null && p.getProductStock() >= amountToReduce) {
+                p.setProductStock(p.getProductStock() - amountToReduce);
+                return true;
+            }
             return false;
         }
     }
