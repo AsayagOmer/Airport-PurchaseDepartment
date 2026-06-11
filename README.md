@@ -33,6 +33,7 @@ The project is structured using a multi-layered architecture, cleanly separating
 ## ✨ Core Features
 
 * **Instant Passenger Authentication**: Quickly scan and authenticate passengers via their passport numbers securely against the database.
+* **Cryptographic Security**: Enforces one-way SHA-256 hashing on all sensitive passenger data (like passports) to prevent plain-text exposure even if the database is compromised.
 * **Dynamic Cart Management**: Real-time cart updates with continuous evaluation of active sale rules.
 * **Smart ML Recommendations**: Upon authentication, the system suggests personalized products to increase average transaction value.
 * **Secure Automated Checkout**: Processes payments, generates comprehensive receipts, and meticulously updates inventory logs to prevent stockouts.
@@ -53,12 +54,17 @@ To ensure the system remains highly responsive under heavy load (e.g., large sho
 To support robust local development and prevent catastrophic failures during network outages, the DAOs implement an automatic "Offline Fallback Mode". 
 If the PostgreSQL database is unreachable (e.g., Docker daemon is down or `Connection Refused`), the system seamlessly pivots to **in-memory mock data**. It mocks passenger profiles, product catalogs, and simulates successful checkout transactions, allowing developers and QA to test the UI and business logic 100% locally without spinning up a database container.
 
-### 3. Behavior-Driven Development (BDD) Pipeline
+### 3. Cryptographic Security Engine
+The system employs a strict one-way hashing protocol for all Personally Identifiable Information (PII) used in authentication.
+* Before any passport number touches the Data Access Layer or is sent across the network to the ML Microservice, it is passed through Java's native `MessageDigest` to generate an unrecognizable **SHA-256** hash.
+* All database queries operate strictly on these hashed strings. This ensures that a compromised database yields absolutely zero plain-text passwords or passport numbers to attackers.
+
+### 4. Behavior-Driven Development (BDD) Pipeline
 The core pricing algorithms (which dictate revenue) are protected by a strict Behavior-Driven Development pipeline using **Cucumber**. 
 * Business requirements are written in plain English Gherkin syntax (`checkout.feature`), ensuring non-technical stakeholders can verify the logic.
 * These feature files automatically map to JUnit assertions (`CheckoutSteps.java`), preventing regressions in discount calculations.
 
-### 4. Modular Build System
+### 5. Modular Build System
 The project uses **Maven** as its build tool, cleanly managing dependencies (JavaFX, PostgreSQL Driver, Cucumber) and standardizing the directory structure (`src/main/java`, `src/test/java`).
 
 ---
