@@ -42,7 +42,7 @@ graph TD
     ProdDAO -->|Read| DB
     PurchRepo -->|Batch Insert/Update| DB
     
-    MLC -->|HTTP GET (Port 8000)| MLMicro
+    MLC -->|HTTP GET - Port 8000| MLMicro
     
     %% Styling Classes
     classDef ui fill:#4CAF50,stroke:#388E3C,stroke-width:2px,color:white,font-weight:bold;
