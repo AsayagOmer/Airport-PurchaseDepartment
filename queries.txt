@@ -33,7 +33,7 @@ CREATE TABLE Products (
 -- 3. Create Purchases Table (Receipt Header)
 CREATE TABLE Purchasing_table (
     purchase_id SERIAL PRIMARY KEY,
-    purchase_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP, -- ב-Postgres משתמשים ב-TIMESTAMP עבור תאריך ושעה
+    purchase_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP, -- In Postgres, TIMESTAMP is used for date and time
     user_id INT REFERENCES passengers(passenger_id),
     total_price FLOAT NOT NULL
 );
